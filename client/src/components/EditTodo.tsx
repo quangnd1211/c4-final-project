@@ -66,9 +66,9 @@ export class EditTodo extends React.PureComponent<
     }
   };
 
-  handleCheckboxChange = (event: React.FormEvent<HTMLInputElement>, data) => {
+  handleCheckboxChange = (event: React.FormEvent<HTMLInputElement>) => {
     this.setState({
-      done: data.checked
+      done: !this.state.done
     })
    
   };
