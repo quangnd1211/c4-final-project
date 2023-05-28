@@ -29,7 +29,8 @@ export class TodosAccess{
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
                 ':userId' : userId
-            }
+            },
+            ScanIndexForward: false
         })
         .promise()
 
@@ -116,19 +117,33 @@ export class TodosAccess{
     ): Promise<TodoItem> {
         logger.info('Udpdate todo attachment url function called')
 
-        await this.docClient
-        .update({
-            TableName: this.todosTable,
-            Key: {
-                todoId: todoId,
-                userId: userId
-            },
-            UpdateExpression: 'set attachmentUrl = :attachmentUrl',
-            ExpressionAttributeValues: {
-                ':attachmentUrl': attachmentUrl
-            }
-        })
-        .promise()
+        if (attachmentUrl !== undefined && attachmentUrl !== '') {
+            await this.docClient
+            .update({
+                TableName: this.todosTable,
+                Key: {
+                    todoId: todoId,
+                    userId: userId
+                },
+                UpdateExpression: 'SET attachmentUrl = :attachmentUrl',
+                ExpressionAttributeValues: {
+                    ':attachmentUrl': attachmentUrl
+                }
+            })
+            .promise()
+        } else {
+            await this.docClient
+            .update({
+                TableName: this.todosTable,
+                Key: {
+                    todoId: todoId,
+                    userId: userId
+                },
+                UpdateExpression: 'REMOVE attachmentUrl'
+            })
+            .promise()
+        }
+        
         logger.info('To-do Item updated!')
         return this.getTodoItem(todoId, userId)
     }    
